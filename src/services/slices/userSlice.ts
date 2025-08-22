@@ -10,7 +10,6 @@ import {
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { TUser } from '@utils-types';
 import { deleteCookie, getCookie, setCookie } from '../../utils/cookie';
-import { useDispatch } from '../store';
 
 interface TUserState {
   isAuthChecked: boolean;
@@ -57,13 +56,26 @@ export const logoutUser = createAsyncThunk(
       await logoutApi();
       deleteCookie('accessToken');
       localStorage.clear();
+      return null;
     } catch (error) {
       rejectWithValue(error);
     }
   }
 );
 export const userApi = createAsyncThunk('user/getUserApi', getUserApi);
-export const updateUser = createAsyncThunk('user/updateUserApi', updateUserApi);
+export const updateUser = createAsyncThunk(
+  'user/updateUserApi',
+  async (
+    userData: Partial<TUser> & { password?: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      return await updateUserApi(userData);
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
 const userSlice = createSlice({
   name: 'user',
@@ -90,7 +102,7 @@ const userSlice = createSlice({
         state.loginUserRequest = false;
         state.isAuthChecked = true;
       })
-.addCase(registerUser.pending, (state) => {
+      .addCase(registerUser.pending, (state) => {
         state.loginUserRequest = true;
         state.user = null;
         state.isAuthenticated = false;
@@ -118,8 +130,6 @@ const userSlice = createSlice({
         state.loginUserRequest = false;
         state.isAuthenticated = false;
         state.user = null;
-        deleteCookie('accessToken');
-        localStorage.removeItem('refreshToken');
       })
       .addCase(userApi.pending, (state) => {
         state.loginUserRequest = true;

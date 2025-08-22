@@ -25,4 +25,3 @@ export const BurgerIngredient: FC<TBurgerIngredientProps> = memo(
     );
   }
 );
-
