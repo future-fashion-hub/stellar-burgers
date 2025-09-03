@@ -130,7 +130,7 @@ describe('user slice tests', () => {
       loginUserRequest: false
     });
   });
-test('register user rejected', () => {
+  test('register user rejected', () => {
     const testErr = new Error('reg test error');
     const newState = userSlice(
       {
@@ -238,7 +238,7 @@ test('register user rejected', () => {
       isAuthChecked: true
     });
   });
-test('get user api rejected', () => {
+  test('get user api rejected', () => {
     const testErr = new Error('get user test error');
     const newState = userSlice(
       {

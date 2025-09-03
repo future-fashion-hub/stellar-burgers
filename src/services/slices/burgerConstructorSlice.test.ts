@@ -96,7 +96,7 @@ describe('constructor test', () => {
       mockIngredient[1].name
     );
   });
-test('add bun', () => {
+  test('add bun', () => {
     const initialState = {
       constructorItems: {
         bun: null,
