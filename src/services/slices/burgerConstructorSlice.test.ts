@@ -1,10 +1,12 @@
-import { expect, test } from '@jest/globals';
+import { expect, test, beforeEach } from '@jest/globals';
 import burgerConstructorSlice, {
   clearOrder,
   moveDownIngredient,
   moveUpIngredient,
   removeIngredient,
-  setConstructorItems
+  setConstructorItems,
+  initialState as originalInitialState,
+  BurgerConstructorState
 } from './burgerConstructorSlice';
 
 describe('constructor test', () => {
@@ -38,6 +40,7 @@ describe('constructor test', () => {
       image_large: 'https://code.s3.yandex.net/react/code/meat-01-large.png'
     }
   ];
+
   const mockBun = [
     {
       id: '3',
@@ -54,20 +57,24 @@ describe('constructor test', () => {
       image_large: 'https://code.s3.yandex.net/react/code/bun-02-large.png'
     }
   ];
-  test('add ingredient', () => {
-    const initialState = {
-      constructorItems: {
-        bun: null,
-        ingredients: []
-      },
-      orderRequest: false,
-      orderModalData: null,
-      orderError: null,
-      isLoading: false
-    };
 
+  let initialState: BurgerConstructorState;
+
+  // Сбрасываем состояние перед каждым тестом
+  beforeEach(() => {
+    initialState = {
+      ...originalInitialState,
+      constructorItems: {
+        bun: mockBun[0],
+        ingredients: [...mockIngredient]
+      }
+    };
+  });
+
+  test('add ingredient', () => {
+    const emptyState = { ...originalInitialState };
     const newState = burgerConstructorSlice(
-      initialState,
+      emptyState,
       setConstructorItems(mockIngredient[0])
     );
     expect(newState.constructorItems.ingredients).toHaveLength(1);
@@ -75,18 +82,8 @@ describe('constructor test', () => {
       mockIngredient[0].name
     );
   });
-  test('remove ingredient', () => {
-    const initialState = {
-      constructorItems: {
-        bun: mockBun[0],
-        ingredients: mockIngredient
-      },
-      orderRequest: false,
-      orderModalData: null,
-      orderError: null,
-      isLoading: false
-    };
 
+  test('remove ingredient', () => {
     const newState = burgerConstructorSlice(
       initialState,
       removeIngredient(mockIngredient[0].id)
@@ -96,34 +93,17 @@ describe('constructor test', () => {
       mockIngredient[1].name
     );
   });
+
   test('add bun', () => {
-    const initialState = {
-      constructorItems: {
-        bun: null,
-        ingredients: []
-      },
-      orderRequest: false,
-      orderModalData: null,
-      orderError: null,
-      isLoading: false
-    };
+    const emptyState = { ...originalInitialState };
     const newState = burgerConstructorSlice(
-      initialState,
+      emptyState,
       setConstructorItems(mockBun[0])
     );
     expect(newState.constructorItems.bun?.name).toEqual(mockBun[0].name);
   });
-  test('move Up ingedient', () => {
-    const initialState = {
-      constructorItems: {
-        bun: mockBun[0],
-        ingredients: mockIngredient
-      },
-      orderRequest: false,
-      orderModalData: null,
-      orderError: null,
-      isLoading: false
-    };
+
+  test('move Up ingredient', () => {
     const newState = burgerConstructorSlice(initialState, moveUpIngredient(1));
     expect(newState.constructorItems.ingredients[0].name).toEqual(
       mockIngredient[1].name
@@ -132,17 +112,8 @@ describe('constructor test', () => {
       mockIngredient[0].name
     );
   });
+
   test('move Down ingredient', () => {
-    const initialState = {
-      constructorItems: {
-        bun: mockBun[0],
-        ingredients: mockIngredient
-      },
-      orderRequest: false,
-      orderModalData: null,
-      orderError: null,
-      isLoading: false
-    };
     const newState = burgerConstructorSlice(
       initialState,
       moveDownIngredient(0)
@@ -154,17 +125,8 @@ describe('constructor test', () => {
       mockIngredient[1].name
     );
   });
+
   test('clear order', () => {
-    const initialState = {
-      constructorItems: {
-        bun: mockBun[0],
-        ingredients: mockIngredient
-      },
-      orderRequest: false,
-      orderModalData: null,
-      orderError: null,
-      isLoading: false
-    };
     const newState = burgerConstructorSlice(initialState, clearOrder());
     expect(newState.constructorItems).toEqual({
       bun: null,
